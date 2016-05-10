@@ -184,7 +184,7 @@ public class BrowserDriver {
      */
     public static void waitForElementVisible(By locator) {
         log.info("Waiting for element visible: " + locator);
-        WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 60);
+        WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
@@ -202,7 +202,7 @@ public class BrowserDriver {
      */
     public static void waitForElementPresent(By locator) {
         log.info("Waiting for element visible: " + locator);
-        WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 60);
+        WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
         wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
@@ -252,5 +252,35 @@ public class BrowserDriver {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /*
+     * Method to return the base URL of the current window
+     */
+    public static String getBaseURL() {
+        String currentURL = driver.getCurrentUrl();
+        String protocol = null;
+        String domain = null;
+
+        try {
+            URL url = new URL(currentURL);
+            protocol = url.getProtocol();
+            domain = url.getHost();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return protocol + "://" + domain;
+    }
+
+    /*
+     * Clicks the element using Javascript
+     */
+    public static void clickJS(By locator) {
+        WebDriverWait wait = new WebDriverWait(driver, 30);
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(locator)));
+
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].click();", driver.findElement(locator));
     }
 }
