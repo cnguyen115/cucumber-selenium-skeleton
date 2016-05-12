@@ -305,4 +305,76 @@ public class BrowserDriver {
         Actions builder = new Actions(driver);
         builder.moveToElement(driver.findElement(locator)).build().perform();
     }
+
+    /*
+     * Clicks the specified locator
+     */
+    public static void click(By locator) {
+        log.info("Clicking: {}", locator);
+        driver.findElement(locator).click();
+    }
+
+    /*
+     * Clear the specified field via locator
+     */
+    public static void clear(By locator) {
+        log.info("Clearing input: {}", locator);
+        driver.findElement(locator).clear();
+    }
+
+    /*
+     * Types the input specified via locator
+     */
+    public static void sendKeys(By locator, String text) {
+        log.info("Typing \"{}\" into locator: {}", text, locator);
+        driver.findElement(locator).sendKeys(text);
+    }
+
+    /*
+     * Grabs the text specified via locator
+     */
+    public static String getText(By locator) {
+        String text = driver.findElement(locator).getText();
+        log.info("The string at {} is: {}", locator, text);
+        return text;
+    }
+
+    /*
+     * Grabs the Element attribute's value
+     */
+    public static String getAttributeValue(By locator, String attribute) {
+        String value = driver.findElement(locator).getAttribute(attribute);
+        log.info("The attribute \"{}\" value of {} is: {}", attribute, locator, value);
+        return value;
+    }
+
+    /*
+     * Checks if element is visible
+     */
+    public static boolean isElementVisible(By locator) {
+        try {
+            WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 5);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            log.info("Element {} is visible", locator);
+            return true;
+        } catch (Exception e) {
+            log.info("Element {} is not visible", locator);
+            return false;
+        }
+    }
+
+    /*
+     * Checks if element is not visible
+     */
+    public static boolean isElementNotVisible(By locator) {
+        try {
+            WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 1);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+            log.info("Element {} is visible", locator);
+            return false;
+        } catch (Exception e) {
+            log.info("Element {} is not visible", locator);
+            return true;
+        }
+    }
 }
