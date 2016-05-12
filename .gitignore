@@ -5,4 +5,4 @@ bin
 /.classpath
 .idea
 *.iml
-selenium_commons.*
+selenium.*

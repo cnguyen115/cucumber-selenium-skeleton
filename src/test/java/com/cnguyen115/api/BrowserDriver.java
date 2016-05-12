@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
@@ -15,14 +17,13 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 
 import cucumber.api.Scenario;
@@ -32,7 +33,7 @@ import cucumber.api.java.Before;
 public class BrowserDriver {
 
     public static WebDriver driver;
-    private static final Logger log = LoggerFactory.getLogger(BrowserDriver.class);
+    private static final Logger log = LogManager.getLogger(BrowserDriver.class);
 
     private @Value("${browser}") String browser;
     private @Value("${location}") String location;
@@ -183,7 +184,7 @@ public class BrowserDriver {
      * Waits for the actual element to appear on the web page
      */
     public static void waitForElementVisible(By locator) {
-        log.info("Waiting for element visible: " + locator);
+        log.info("Waiting for element visible for locator: {}", locator);
         WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
@@ -192,7 +193,7 @@ public class BrowserDriver {
      * Waits for the actual element to appear on the web page
      */
     public static void waitForElementVisible(By locator, long timeout) {
-        log.info("Waiting for element visible for " + timeout + " seconds: " + locator);
+        log.info("Waiting for element visible for locator: {}", locator);
         WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
         wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
@@ -201,7 +202,7 @@ public class BrowserDriver {
      * Waits for the element to load from the html
      */
     public static void waitForElementPresent(By locator) {
-        log.info("Waiting for element visible: " + locator);
+        log.info("Waiting for element present  for locator: {}", locator);
         WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
         wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
@@ -210,7 +211,7 @@ public class BrowserDriver {
      * Waits for the element to load from the html
      */
     public static void waitForElementPresent(By locator, long timeout) {
-        log.info("Waiting for element visible for " + timeout + " seconds: " + locator);
+        log.info("Waiting for element present for locator: {}", locator);
         WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
         wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
@@ -219,6 +220,7 @@ public class BrowserDriver {
      * Uses JS to detect if the page is fully loaded
      */
     public static void waitForPageLoad() {
+        log.info("Wait for page load via JS...");
         String state = "";
         int counter = 0;
 
@@ -239,6 +241,7 @@ public class BrowserDriver {
      * Returns true if an attribute exists for the element specified
      */
     public static boolean isAttributePresent(By locator, String attribute) {
+        log.info("Is Attribute Present for locator: {}, attribute: {}", locator, attribute);
         return driver.findElement(locator).getAttribute(attribute) != null;
     }
 
@@ -246,6 +249,7 @@ public class BrowserDriver {
      * Method to select a dropdown option by index
      */
     public static void selectDropdownByIndex(By locator, int index) {
+        log.info("Select Dropdown for locator: {} and index: {}", locator, index);
         try {
             Select select = new Select(driver.findElement(locator));
             select.selectByIndex(index);
@@ -258,6 +262,7 @@ public class BrowserDriver {
      * Method to return the base URL of the current window
      */
     public static String getBaseURL() {
+        log.info("Get base URL: {}", driver.getCurrentUrl());
         String currentURL = driver.getCurrentUrl();
         String protocol = null;
         String domain = null;
@@ -277,10 +282,27 @@ public class BrowserDriver {
      * Clicks the element using Javascript
      */
     public static void clickJS(By locator) {
+        log.info("Clicking on locator via JS: {}", locator);
         WebDriverWait wait = new WebDriverWait(driver, 30);
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(locator)));
 
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("arguments[0].click();", driver.findElement(locator));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(locator));
+    }
+
+    /*
+     * Scrolls the webpage to where the element is located via javascript
+     */
+    public static void scrollIntoView(By locator) {
+        log.info("Scrolling into view: {}", locator);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(locator));
+    }
+
+    /*
+     * Hovers mouse cursor over a specified element
+     */
+    public static void mouseOver(By locator) {
+        log.info("Mouse over: {}", locator);
+        Actions builder = new Actions(driver);
+        builder.moveToElement(driver.findElement(locator)).build().perform();
     }
 }
